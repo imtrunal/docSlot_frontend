@@ -55,6 +55,7 @@ import { ReactComponent as AlertHexaIcon } from "./alert-hexa.svg?react";
 import { ReactComponent as ErrorHexaIcon } from "./info-hexa.svg?react";
 import {ReactComponent as AppointmentIcon} from "./appointment.svg?react";
 import {ReactComponent as ClinicIcon} from "./clinic.svg?react";
+// import {ReactComponent as ClinicIcon} from "./clinic_icon.svg?react";
 // import {ReactComponent as ViewIcon} from "./view.svg?react";
 import {ReactComponent as ViewIcon} from "./viewIcon.svg?react";
 
