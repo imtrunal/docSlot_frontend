@@ -11,7 +11,7 @@ const AppHeader: React.FC = () => {
   const { } = useSidebar();
 
 
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar,isExpanded, isHovered  } = useSidebar();
+  const { isMobileOpen, toggleSidebar, toggleMobileSidebar, isExpanded, isHovered } = useSidebar();
 
   const handleToggle = () => {
     if (window.innerWidth >= 991) {
@@ -86,16 +86,17 @@ const AppHeader: React.FC = () => {
 
           <Link to="/" className="lg:hidden">
             <img
-              className="dark:hidden"
-              src="images/logo/logo.svg"
+              className="dark:hidden w-36"
+              src="images/logo/DS-logo-light-1.png"
               alt="Logo"
             />
             <img
-              className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
+              className="hidden dark:block w-36"
+              src="./images/logo/DS-logo-dark-1.png"
               alt="Logo"
             />
           </Link>
+
 
           <button
             onClick={toggleApplicationMenu}
@@ -153,9 +154,8 @@ const AppHeader: React.FC = () => {
           </div> */}
         </div>
         <div
-          className={`${
-            isApplicationMenuOpen ? "flex" : "hidden"
-          } items-center justify-center w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
+          className={`${isApplicationMenuOpen ? "flex" : "hidden"
+            } items-center justify-center w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Dark Mode Toggler --> */}

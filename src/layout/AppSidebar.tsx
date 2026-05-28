@@ -153,7 +153,7 @@ const AppSidebar: React.FC = () => {
       return false;
     }
 
-    if(item.name === "Users" && role === "RECEPTIONIST"){
+    if (item.name === "Users" && role === "RECEPTIONIST") {
       return false;
     }
 
@@ -167,11 +167,10 @@ const AppSidebar: React.FC = () => {
           {nav.name === "Dashboard" ? (
             <Link
               to={getDashboardPath()}
-              className={`menu-item group ${
-                isActive("dashboard") || isActive("clinic-dashboard")
+              className={`menu-item group ${isActive("dashboard") || isActive("clinic-dashboard")
                   ? "menu-item-active"
                   : "menu-item-inactive"
-              }`}
+                }`}
             >
               <span className="menu-item-icon-size menu-item-icon-inactive">
                 {nav.icon}
@@ -183,11 +182,10 @@ const AppSidebar: React.FC = () => {
           ) : nav.name === "Appointment" ? (
             <Link
               to={getClinicAppointmentPath()}
-              className={`menu-item group ${
-                isActive("appointment") || isActive("clinicAppointment")
+              className={`menu-item group ${isActive("appointment") || isActive("clinicAppointment")
                   ? "menu-item-active"
                   : "menu-item-inactive"
-              }`}
+                }`}
             >
               <span className="menu-item-icon-size menu-item-icon-inactive">
                 {nav.icon}
@@ -214,9 +212,8 @@ const AppSidebar: React.FC = () => {
                 <>
                   <span className="menu-item-text">{nav.name}</span>
                   <ChevronDownIcon
-                    className={`ml-auto w-5 h-5 transition-transform ${
-                      openSubmenu?.index === index ? "rotate-180" : ""
-                    }`}
+                    className={`ml-auto w-5 h-5 transition-transform ${openSubmenu?.index === index ? "rotate-180" : ""
+                      }`}
                   />
                 </>
               )}
@@ -225,9 +222,8 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 to={nav.path}
-                className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                }`}
+                className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                  }`}
               >
                 <span className="menu-item-icon-size menu-item-icon-inactive">
                   {nav.icon}
@@ -257,11 +253,10 @@ const AppSidebar: React.FC = () => {
                   <li key={sub.name}>
                     <Link
                       to={sub.path}
-                      className={`menu-dropdown-item ${
-                        isActive(sub.path)
+                      className={`menu-dropdown-item ${isActive(sub.path)
                           ? "menu-dropdown-item-active"
                           : "menu-dropdown-item-inactive"
-                      }`}
+                        }`}
                     >
                       {sub.name}
                     </Link>
@@ -292,14 +287,14 @@ const AppSidebar: React.FC = () => {
             <>
               <img
                 className="dark:hidden"
-                src="images/logo/logo.svg"
+                src="images/logo/DS-logo-light-1.png"
                 alt="Logo"
                 width={150}
                 height={40}
               />
               <img
                 className="hidden dark:block"
-                src="./images/logo/logo-dark.svg"
+                src="images/logo/DS-logo-dark-1.png"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -307,7 +302,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <img
-              src="./images/logo/logo-icon.svg"
+              src="./images/logo/DocSlot.png"
               alt="Logo"
               width={32}
               height={32}

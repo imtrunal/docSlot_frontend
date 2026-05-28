@@ -10,8 +10,8 @@
 //   return (
 //     <>
 //       <PageMeta
-//         title="React.js Ecommerce Dashboard | TailAdmin - React.js Admin Dashboard Template"
-//         description="This is React.js Ecommerce Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
+//         title="React.js Ecommerce Dashboard | DocSlot - React.js Admin Dashboard Template"
+//         description="This is React.js Ecommerce Dashboard page for DocSlot - React.js Tailwind CSS Admin Dashboard Template"
 //       />
 //       <div className="grid grid-cols-12 ">
 //         <div className="col-span-12 space-y-6 xl:col-span-7">
@@ -40,15 +40,13 @@
 //   );
 // }
 import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
-// import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
-// import StatisticsChart from "../../components/ecommerce/StatisticsChart";
 import PageMeta from "../../components/common/PageMeta";
 
 export default function Home() {
   return (
     <>
       <PageMeta
-        title="React.js Ecommerce Dashboard | TailAdmin"
+        title="React.js Ecommerce Dashboard | DocSlot"
         description="Dashboard page"
       />
 
@@ -57,20 +55,7 @@ export default function Home() {
         {/* FULL WIDTH */}
         <div className="col-span-12 space-y-6">
           <EcommerceMetrics />
-          {/* <MonthlySalesChart /> */}
         </div>
-
-        {/* <div className="col-span-12">
-          <StatisticsChart />
-        </div> */}
-
-        {/* <div className="col-span-12 xl:col-span-5">
-          <DemographicCard />
-        </div>
-
-        <div className="col-span-12 xl:col-span-7">
-          <RecentOrders />
-        </div> */}
       </div>
     </>
   );
