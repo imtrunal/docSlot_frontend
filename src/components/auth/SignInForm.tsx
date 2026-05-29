@@ -1,17 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { EyeCloseIcon, EyeIcon } from "../../icons";
+import { useNavigate } from "react-router-dom";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
-import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {url} from "../../baseUrl";
+import { url } from "../../baseUrl";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
 
   const [phone, setPhone] = useState("9000000001");
   const [password, setPassword] = useState("Super1");
@@ -54,12 +52,12 @@ export default function SignInForm() {
 
       const data = await response.json();
       const token = data?.data?.accessTokenHash;
-      const role = data?.data?.role; 
+      const role = data?.data?.role;
       const clinicid = data?.data?.user?.clinicId?._id;
       const UserName = data?.data?.user?.name;
       const clinicName = data?.data?.user?.clinicId?.name;
       const permissions = data?.data?.permissions;
-  
+
 
       if (!response.ok || !token || !role) {
         toast.error("Invalid login credentials");
@@ -75,21 +73,21 @@ export default function SignInForm() {
       localStorage.setItem("UserName", UserName);
       localStorage.setItem("clinicName", clinicName);
       localStorage.setItem("sessionActive", "true");
-      localStorage.setItem("permissions",JSON.stringify(permissions));
+      localStorage.setItem("permissions", JSON.stringify(permissions));
 
       toast.success("Login successful");
-      
+
 
       /* -------------------------------
          4️⃣ ROLE BASED REDIRECTION
       -------------------------------- */
-      
+
       setTimeout(() => {
         if (role === "SUPER ADMIN") {
-          
+
           navigate("/dashboard", { replace: true });
         } else if (role !== "SUPER ADMIN") {
-          
+
           navigate("/clinic-dashboard", { replace: true });
         } else {
           toast.error("Unauthorized role");
@@ -143,22 +141,12 @@ export default function SignInForm() {
                     className="absolute z-10 cursor-pointer right-4 top-1/2 -translate-y-1/2"
                   >
                     {showPassword ? (
-                      <EyeIcon className="w-5 h-5 text-gray-500" />
+                      <FaEye className="w-5 h-5 text-gray-500" />
                     ) : (
-                      <EyeCloseIcon className="w-5 h-5 text-gray-500" />
+                      <FaEyeSlash className="w-5 h-5 text-gray-500" />
                     )}
                   </span>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                {/* <div className="flex items-center gap-3">
-                  <Checkbox checked={isChecked} onChange={setIsChecked} />
-                  <span className="text-sm">Keep me logged in</span>
-                </div> */}
-                <Link to="#" className="text-sm text-brand-500">
-                  Forgot password?
-                </Link>
               </div>
 
               <Button className="w-full" size="sm" disabled={loading}>

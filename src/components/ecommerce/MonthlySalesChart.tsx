@@ -2,7 +2,7 @@ import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "../../icons";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import { useState } from "react";
 
 export default function MonthlySalesChart() {
@@ -101,7 +101,7 @@ export default function MonthlySalesChart() {
     setIsOpen(false);
   }
   return (
-    <div className="p-6 sameCSS ml-0 md:ml-[260px] lg:ml-0 sm:ml-[100px] xs:ml-[100px] transition-all duration-300">
+    <div>
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
@@ -109,7 +109,7 @@ export default function MonthlySalesChart() {
           </h3>
           <div className="relative inline-block">
             <button className="dropdown-toggle" onClick={toggleDropdown}>
-              <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
+              <BsThreeDotsVertical  className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
             </button>
             <Dropdown
               isOpen={isOpen}

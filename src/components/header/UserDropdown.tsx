@@ -32,7 +32,7 @@ type Clinic = {
   city: string;
   state: string;
   isActive: boolean;
-  bookingSlug:string;
+  bookingSlug: string;
 };
 
 export default function UserDropdown() {
@@ -62,7 +62,7 @@ export default function UserDropdown() {
     city: "",
     state: "",
     isActive: true,
-    bookingSlug:"",
+    bookingSlug: "",
   });
 
   function toggleDropdown() {
@@ -93,8 +93,8 @@ export default function UserDropdown() {
         Authorization: `Bearer ${token}`,
       },
     });
-    
-    if(role === "ADMIN"){
+
+    if (role === "ADMIN") {
       if (!res.ok) {
         toast.error("Failed to load clinics");
         return;
@@ -103,9 +103,9 @@ export default function UserDropdown() {
 
     const response = await res.json();
     if (!res.ok) {
-          toast.error(response.errorMessage || 'Failed to fetch clinic');
-          return;
-        }
+      toast.error(response.errorMessage || 'Failed to fetch clinic');
+      return;
+    }
     // const data = response.data ?? response;
     const rawData = response.data ?? response;
 
@@ -121,14 +121,14 @@ export default function UserDropdown() {
       city: rawData.city,
       state: rawData.state,
       isActive: rawData.isActive || true,
-      bookingSlug:rawData.bookingSlug,
+      bookingSlug: rawData.bookingSlug,
     });
   };
   if (role === "ADMIN") {
     useEffect(() => {
-      
+
       GetClinicProfile();
-      
+
     }, []);
   }
 
@@ -136,21 +136,21 @@ export default function UserDropdown() {
   //   setFormData({ ...formData, [e.target.name]: e.target.value });
   // };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    if(name == "name"){
+    if (name == "name") {
       formData.bookingSlug = value
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '')
     }
-    
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    
+
   };
 
   const handleSave = async () => {
@@ -171,9 +171,9 @@ export default function UserDropdown() {
 
     const result = await response.json();
     if (!response.ok) {
-          toast.error(result.errorMessage || 'Failed to update clinic');
-          return;
-        }
+      toast.error(result.errorMessage || 'Failed to update clinic');
+      return;
+    }
 
     if (response.ok) {
       toast.success(result.message || "Profile updated successfully");
@@ -213,9 +213,8 @@ export default function UserDropdown() {
           {name}
         </span>
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpenu ? "rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpenu ? "rotate-180" : ""
+            }`}
           width="18"
           height="20"
           viewBox="0 0 18 20"
@@ -252,11 +251,9 @@ export default function UserDropdown() {
               <DropdownItem
                 onItemClick={closeDropdown}
                 onClick={() => {
-                    // setMode("edit");
-                    // openModal();
-                    // GetClinicProfile();
-                    setConfirmOpen(true);
-                  }}
+                  setMode("edit");
+                  openModal();
+                }}
                 tag="a"
                 to={path}
                 className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
@@ -276,7 +273,7 @@ export default function UserDropdown() {
                     fill=""
                   />
                 </svg>
-                  Edit Clinic
+                Edit Clinic
               </DropdownItem>
             </li>
           )}
@@ -303,8 +300,6 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              {/* Account settings */}
-              {/* <Link to="/resetPassword">Reset Password</Link> */}
               Reset Password
             </DropdownItem>
           </li>
@@ -312,8 +307,8 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               onClick={() => {
-                  openModal();
-                }}
+                setConfirmOpen(true);
+              }}
               tag="a"
               to={path}
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
@@ -333,7 +328,7 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-                Support
+              Support
             </DropdownItem>
           </li>
         </ul>
@@ -364,248 +359,131 @@ export default function UserDropdown() {
       <Modal
         isOpen={isOpen}
         onClose={closeModal}
-        className="max-w-[600px] m-4 mt-16"
+        className="max-w-[520px]"
       >
-        {/* <div className="bg-white rounded-2xl p-6 relative z-20">
-          {role === "ADMIN" && (
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-6">
-              <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-                {mode === "add" && "New Clinic"}
-                {mode === "edit" && "Update Clinic"}
-                {mode === "view" && "View Clinic"}
-              </h3>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <Label>Clinic Name</Label>
-                  <Input
-                    name="clinicName"
-                    value={formData.clinicName}
-                    onChange={handleChange}
-                  />
-                </div>
+        {role === "ADMIN" && (
+          <div className="dark:bg-gray-900">
 
-                <div>
-                  <Label>Owner Name</Label>
-                  <Input
-                    name="ownerName"
-                    value={formData.ownerName}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="w-full">
-                  <Label>Owner Mobile</Label>
-                  <Input
-                    className="border-gray-300 rounded-lg "
-                    name="ownerMobile"
-                    value={formData.ownerMobile}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div>
-                  <Label>Clinic Address</Label>
-                  <Input
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="w-full flex gap-7">
-                  <div className="w-full">
-                    <Label>City</Label>
-                    <Input
-                      className="border-gray-300 rounded-lg"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="w-full">
-                    <Label>State</Label>
-                    <Input
-                      className="border-gray-300 rounded-lg"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
+            {/* Header */}
+            <div className="flex items-center gap-4 px-6 py-5" style={{ background: "#465FFF" }}>
+              <div
+                className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: "rgba(255,255,255,0.2)" }}
+              >
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
               </div>
-
-              <div className="flex justify-end gap-3 mt-6">
-                <Button size="sm" variant="outline" onClick={closeModal}>
-                  Close
-                </Button>
-
-                <Button size="sm" onClick={handleSave}>
-                  {mode === "edit" ? "Update" : "Save"}
-                </Button>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-semibold text-base m-0">
+                  {mode === "add" && "New Clinic"}
+                  {mode === "edit" && "Update Clinic"}
+                  {mode === "view" && "View Clinic"}
+                </p>
+                <p className="text-white/60 text-xs mt-0.5 m-0">
+                  {mode === "edit" ? "Update clinic details below" : mode === "add" ? "Fill in the details below" : "Clinic information"}
+                </p>
               </div>
             </div>
-          )}
-        </div> */}
 
-        <div className="max-w-2xl mx-auto p-6">
-          <div className="font-semibold text-2xl mb-5 dark:text-white">Support & Help</div>
+            {/* Body */}
+            <div className="p-6 flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                  Clinic Name <span className="text-red-500">*</span>
+                </label>
+                <Input name="clinicName" value={formData.name} onChange={handleChange} />
+              </div>
 
-          <div className="mb-6">
-            <h2 className="text-lg font-medium mb-2 dark:text-gray-300">Contact Support</h2>
-            <p className="text-gray-700 dark:text-gray-400">📧 Email: support@cliniccare.com</p>
-            <p className="text-gray-700 dark:text-gray-400">📞 Phone: +91 98765 43210</p>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                  Owner Name <span className="text-red-500">*</span>
+                </label>
+                <Input name="ownerName" value={formData.ownerName} onChange={handleChange} />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                  Owner Mobile <span className="text-red-500">*</span>
+                </label>
+                <Input name="ownerMobile" value={formData.ownerMobile} onChange={handleChange} />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                  Clinic Address <span className="text-red-500">*</span>
+                </label>
+                <Input name="address" value={formData.address} onChange={handleChange} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                    City <span className="text-red-500">*</span>
+                  </label>
+                  <Input name="city" value={formData.city} onChange={handleChange} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                    State <span className="text-red-500">*</span>
+                  </label>
+                  <Input name="state" value={formData.state} onChange={handleChange} />
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+              >
+                Close 
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-5 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90"
+                style={{ background: "#465FFF" }}
+              >
+                {mode === "edit" ? "Update Clinic" : "Save Clinic"}
+              </button>
+            </div>
+
           </div>
-
-          <div className="mb-6">
-            <h2 className="text-lg font-medium mb-2 dark:text-gray-300">Support Hours</h2>
-            <p className="text-gray-700 dark:text-gray-400">
-              Monday – Saturday, 9:30 AM – 6:30 PM
-            </p>
-          </div>
-
-          <div>
-            <Button className="flex justify-end dark:bg-gray-700"  onClick={closeModal}>Cancel</Button>
-          </div>
-        </div>
+        )}
       </Modal>
+
 
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <div className="dark:bg-gray-900 dark:text-white">
-        <DialogTitle className="text-2xl font-semibold mb-4">
-          {/* Support & Help */}
-          {/* {role === "ADMIN" && (
-            <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-              {mode === "edit" && "Update Clinic"}
-            </h3>
-          )} */}
-          Update Clinic 
-        </DialogTitle>
+          <DialogTitle className="text-2xl font-semibold mb-4">
+            Support & Help
+          </DialogTitle>
 
-        <DialogContent>
-          {/* <div className="max-w-2xl mx-auto p-6">
+          <DialogContent>
+            <div className="max-w-2xl mx-auto p-6">
 
-            <div className="mb-6">
-              <h2 className="text-lg font-medium mb-2">Contact Support</h2>
-              <p className="text-gray-700">📧 Email: support@cliniccare.com</p>
-              <p className="text-gray-700">📞 Phone: +91 98765 43210</p>
-            </div>
-
-            <div className="mb-6">
-              <h2 className="text-lg font-medium mb-2">Support Hours</h2>
-              <p className="text-gray-700">
-                Monday – Saturday, 9:30 AM – 6:30 PM
-              </p>
-            </div>
-          </div> */}
-
-          <div className="bg-white rounded-2xl relative z-20">
-            {role === "ADMIN" && (
-              <div className="bg-white dark:bg-gray-900 rounded-2xl p-6">
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
-                    <Label>Clinic Name</Label>
-                    <Input
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Owner Name</Label>
-                    <Input
-                      name="ownerName"
-                      value={formData.ownerName}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  {/* <div className="w-full gap-7 flex">
-                  <div className="w-full">
-                    <Label>Login Number</Label>
-                    <Input
-                      className="border-gray-300 rounded-lg"
-                      name="loginNumber"
-                      value={formData.loginNumber}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="w-full">
-                    <Label>Password</Label>
-                    <Input
-                      name="password"
-                      type="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder="Add new password"
-                    />
-                  </div>
-                </div> */}
-
-                  <div className="w-full">
-                    <Label>Owner Mobile</Label>
-                    <Input
-                      className="border-gray-300 rounded-lg "
-                      name="ownerMobile"
-                      value={formData.ownerMobile}
-                      onChange={handleChange}
-                      maxLength={10}
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Clinic Address</Label>
-                    <Input
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="w-full flex gap-7">
-                    <div className="w-full">
-                      <Label>City</Label>
-                      <Input
-                        className="border-gray-300 rounded-lg"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="w-full">
-                      <Label>State</Label>
-                      <Input
-                        className="border-gray-300 rounded-lg"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                </div>
+              <div className="mb-6">
+                <h2 className="text-lg font-medium mb-2">Contact Support</h2>
+                <p className="text-gray-700">📧 Email: support@cliniccare.com</p>
+                <p className="text-gray-700">📞 Phone: +91 98765 43210</p>
               </div>
-            )}
-          </div>
-        </DialogContent>
 
-        <DialogActions>
-          {/* <Button onClick={() => setConfirmOpen(false)}>Cancel</Button> */}
-          <div className="flex justify-end gap-3 mt-6">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setConfirmOpen(false)}
-            >
-              Close
-            </Button>
+              <div className="mb-6">
+                <h2 className="text-lg font-medium mb-2">Support Hours</h2>
+                <p className="text-gray-700">
+                  Monday – Saturday, 9:30 AM – 6:30 PM
+                </p>
+              </div>
+            </div>
 
-            <Button size="sm" onClick={handleSave}>
-              {mode === "edit" ? "Update" : "Save"}
-            </Button>
-          </div>
-        </DialogActions>
+
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+          </DialogActions>
         </div>
       </Dialog>
     </div>

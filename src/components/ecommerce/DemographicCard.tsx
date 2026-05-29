@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "../../icons";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import CountryMap from "./CountryMap";
 
 export default function DemographicCard() {
@@ -15,7 +15,7 @@ export default function DemographicCard() {
     setIsOpen(false);
   }
   return (
-    <div className="p-6 sameCSS ml-0 md:ml-[260px] lg:ml-0 sm:ml-[100px] xs:ml-[100px] transition-all duration-300">
+    <div>
       <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
         <div className="flex justify-between">
           <div>
@@ -28,7 +28,7 @@ export default function DemographicCard() {
           </div>
           <div className="relative inline-block">
             <button className="dropdown-toggle" onClick={toggleDropdown}>
-              <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
+              <HiOutlineDotsHorizontal className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
             </button>
             <Dropdown
               isOpen={isOpen}

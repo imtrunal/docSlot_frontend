@@ -3,7 +3,8 @@ import ComponentCard from "../../common/ComponentCard";
 import Label from "../Label";
 import Input from "../input/InputField";
 import Select from "../Select";
-import { CalenderIcon, EyeCloseIcon, EyeIcon, TimeIcon } from "../../../icons";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { MdCalendarMonth, MdAccessTime } from "react-icons/md";
 import Flatpickr from "react-flatpickr";
 
 export default function DefaultInputs() {
@@ -53,9 +54,9 @@ export default function DefaultInputs() {
               className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
             >
               {showPassword ? (
-                <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
+                <FaEye className="text-gray-500 dark:text-gray-400 size-5" />
               ) : (
-                <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
+                <FaEyeSlash className="text-gray-500 dark:text-gray-400 size-5" />
               )}
             </button>
           </div>
@@ -73,7 +74,7 @@ export default function DefaultInputs() {
               className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring  dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30  bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700  dark:focus:border-brand-800"
             />
             <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-              <CalenderIcon className="size-6" />
+              <MdCalendarMonth  className="size-6" />
             </span>
           </div>
         </div>
@@ -87,7 +88,7 @@ export default function DefaultInputs() {
               onChange={(e) => console.log(e.target.value)}
             />
             <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-              <TimeIcon className="size-6" />
+              <MdAccessTime  className="size-6" />
             </span>
           </div>
         </div>

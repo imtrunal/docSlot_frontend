@@ -8,13 +8,14 @@ import UserDropdown from "../components/header/UserDropdown";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
-  const { } = useSidebar();
+  // const { } = useSidebar();
+  const MOBILE_BREAKPOINT = 768;
 
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar, isExpanded, isHovered } = useSidebar();
 
   const handleToggle = () => {
-    if (window.innerWidth >= 991) {
+    if (window.innerWidth >= MOBILE_BREAKPOINT) {
       toggleSidebar();
     } else {
       toggleMobileSidebar();

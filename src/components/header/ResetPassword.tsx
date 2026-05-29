@@ -61,7 +61,7 @@ function ResetPassword() {
   };
 
   return (
-    <div className="p-6 sameCSS ml-0 md:ml-[260px] lg:ml-0 sm:ml-[100px] xs:ml-[100px] transition-all duration-300">
+    <div>
       <div className="reset-password w-[400px] m-auto border border-b-gray-300 p-6 my-4 rounded dark:border-gray-600">
         <div className="">
           <h1 className="text-2xl text-center font-semibold py-6 dark:text-white">

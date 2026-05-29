@@ -1,32 +1,17 @@
 import { useEffect, useState } from "react";
 import Button from "../ui/button/Button";
-// import { Button } from "@mui/material";
 import Input from "../form/input/InputField";
-import Label from "../form/Label";
-import { Modal } from "../ui/modal";
 import { useModal } from "../../hooks/useModal";
-import Card from "@mui/material/Card";
-import Table from "@mui/material/Table";
-// import { Table } from "../ui/table";
-import TableRow from "@mui/material/TableRow";
-import TableBody from "@mui/material/TableBody";
-import TableHead from "@mui/material/TableHead";
-// import { TableHeader } from "../ui/table";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-// import TablePagination from "@mui/material/TablePagination";
 import { url } from "../../baseUrl";
-import { TrashBinIcon, PencilIcon } from "../../icons";
 import { toast } from "react-toastify";
 import { requiredPermissions } from "../../utils/permissions";
-import { TablePagination } from "../ui/table/TablePagination";
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import { Modal } from "../ui/modal";
 
 
 // --------------------
@@ -54,13 +39,12 @@ type Clinics = {
   name: string;
 };
 
-// const STORAGE_KEY = "users_table_data";
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [mode, setMode] = useState<"add" | "view" | "edit">("add");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -73,6 +57,7 @@ export default function UserMetaCard() {
 
   const clinicId = localStorage.getItem("clinicId");
   const role = localStorage.getItem("role");
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     clinicId: clinicId || "",
@@ -86,34 +71,41 @@ export default function UserMetaCard() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const res = await fetch(`${url}/users`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      setLoading(true);
+      const res = await fetch(`${url}/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const response = await res.json();
-    if (!res.ok) {
-      toast.error(response.errorMessage || 'Failed to fetch user');
-      return;
+      const response = await res.json();
+      if (!res.ok) {
+        toast.error(response.errorMessage || 'Failed to fetch user');
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mappedUsers: UserMeta[] = response.data.map((user: any) => ({
+        id: user._id,
+        clinicId: user.clinicId,
+        name: user.name,
+        mobile: user.mobile || user.loginNumber,
+        password: user.password,
+        roleId: user.roleId,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+      }));
+
+      mappedUsers.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+
+      setUsers(mappedUsers);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mappedUsers: UserMeta[] = response.data.map((user: any) => ({
-      id: user._id,
-      clinicId: user.clinicId,
-      name: user.name,
-      mobile: user.mobile || user.loginNumber,
-      password: user.password,
-      roleId: user.roleId,
-      isActive: user.isActive,
-      createdAt: user.createdAt,
-    }));
-
-    mappedUsers.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-
-    setUsers(mappedUsers);
   };
   useEffect(() => {
     fetchUsers();
@@ -140,7 +132,7 @@ export default function UserMetaCard() {
       setUserRole(response.data || []);
     };
 
-    if(role === "SUPER ADMIN" || role === "ADMIN"){
+    if (role === "SUPER ADMIN" || role === "ADMIN") {
       fetchRoles();
     }
   }, []);
@@ -172,65 +164,6 @@ export default function UserMetaCard() {
       fetchclinics();
     }
   }, []);
-
-  // --------------------
-  // SAVE / UPDATE
-  // --------------------
-
-  // const handleSave = async () => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token) return;
-
-  //   if (role === "SUPER_ADMIN" && !formData.clinicId) {
-  //     alert("Please select a clinic");
-  //     return;
-  //   }
-  //   // const { clinicId: _removed, ...restFormData } = formData;
-
-  //   const payload = {
-  //     ...formData,
-  //     clinicId:
-  //       role === "SUPER_ADMIN"
-  //         ? formData.clinicId // dropdown value
-  //         : clinicId, // token value
-  //   };
-
-  //   if (mode === "add") {
-  //     const res = await fetch(`${url}/users/add`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       // body: JSON.stringify({ ...formData, clinicId }),
-  //       body: JSON.stringify(payload),
-  //     });
-
-  //     const response = await res.json();
-
-
-  //     if (response?.data) {
-  //       alert("hello");
-  //       const newUser = {
-  //         id: response.data._id,
-  //         clinicId: response.data?.clinicId,
-  //         name: response.data.name,
-  //         mobile: response.data.mobile,
-  //         password: response.data.password,
-  //         roleId: response.data.roleId,
-  //         isActive: response.data.isActive,
-  //         createdAt: response.data.createdAt,
-  //       };
-
-
-  //       // ✅ ADD AT TOP + GO TO FIRST PAGE
-  //       setUsers((prev) => [newUser, ...prev]);
-  //       setPage(0);
-  //     }
-  //   }
-  //   closeModal();
-  //   fetchUsers();
-  // };
 
   const handleSave = async () => {
     const token = localStorage.getItem("token");
@@ -402,37 +335,6 @@ export default function UserMetaCard() {
       setDeleteUserId(null);
     }
   };
-
-
-
-  // const handleDelete = async (userId: string) => {
-  //   if (!confirm("Delete this user?")) return;
-
-  //   const token = localStorage.getItem("token");
-  //   if (!token) return;
-
-  //   await fetch(`${url}/users/${userId}`, {
-  //     method: "DELETE",
-  //     headers: { Authorization: `Bearer ${token}` },
-  //   });
-
-  //   setUsers((prev) => prev.filter((u) => u.id !== userId));
-  // };
-
-  //pagination
-
-  // const handleChangePage = useCallback((_e: unknown, newPage: number) => {
-  //   setPage(newPage);
-  // }, []);
-
-  // const handleChangeRowsPerPage = useCallback(
-  //   (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     setRowsPerPage(parseInt(e.target.value, 10));
-  //     setPage(0);
-  //   },
-  //   [],
-  // );
-
   //search
   const filteredUsers = users.filter(
     (users) =>
@@ -468,14 +370,6 @@ export default function UserMetaCard() {
           isActive: desiredStatus === true,
         }),
       });
-
-
-      // if (!res.ok) {
-      //   const err = await res.text();
-      //   console.error("Backend error:", err);
-      //   toast.error("Failed to update status");
-      //   return;
-      // }
 
       const response = await res.json();
 
@@ -514,7 +408,7 @@ export default function UserMetaCard() {
   }, [filteredUsers.length, rowsPerPage, page]);
 
   return (
-    <div className="py-5 sameCSS px-0 md:pl-5   ml-0 md:ml-[260px] lg:ml-0 sm:ml-[100px] xs:ml-[100px] transition-all duration-300">
+    <div>
       <div className="flex users items-center justify-between mb-6 ">
         <h2 className="text-2xl font-semibold dark:text-white">Users</h2>
 
@@ -566,265 +460,495 @@ export default function UserMetaCard() {
         />
       </div>
 
-      <Card>
-        <TableContainer>
-          <Table className="dark:bg-gray-900">
-            <TableHead>
-              <TableRow>
-                {/* <TableCell>Clinic ID</TableCell> */}
-                <TableCell className="dark:text-gray-400">Name</TableCell>
-                <TableCell className="dark:text-gray-400">Mobile</TableCell>
-                {/* <TableCell>Password Hash</TableCell> */}
-                <TableCell className="dark:text-gray-400">Role</TableCell>
+      <div className="rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr style={{ background: "#465FFF" }}>
+                <th className="text-left px-5 py-4 text-xs font-semibold uppercase tracking-widest text-white/80 w-[30%]">
+                  Name
+                </th>
+                <th className="text-left px-5 py-4 text-xs font-semibold uppercase tracking-widest text-white/80 w-[20%]">
+                  Mobile
+                </th>
+                <th className="text-left px-5 py-4 text-xs font-semibold uppercase tracking-widest text-white/80 w-[18%]">
+                  Role
+                </th>
                 {requiredPermissions("user:status_change") && (
-                  <TableCell className="dark:text-gray-400">Status</TableCell>
+                  <th className="text-left px-5 py-4 text-xs font-semibold uppercase tracking-widest text-white/80 w-[14%]">
+                    Status
+                  </th>
                 )}
-                <TableCell className="dark:text-gray-400" align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
+                <th className="text-center px-5 py-4 text-xs font-semibold uppercase tracking-widest text-white/80 w-[18%]">
+                  Actions
+                </th>
+              </tr>
+            </thead>
 
-            <TableBody >
-              {filteredUsers
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((user) => (
-
-                  <TableRow key={user.id}>
-                    {/* <TableCell>{user.clinicId}</TableCell> */}
-                    <TableCell className="dark:text-gray-400">{user.name}</TableCell>
-                    <TableCell className="dark:text-gray-400">{user.mobile}</TableCell>
-                    {/* <TableCell>{user.passwordHash}</TableCell> */}
-                    <TableCell className="dark:text-gray-400">{user.roleId.name}</TableCell>
-                    {requiredPermissions("user:status_change") && (
-                      <TableCell className="dark:text-gray-400">
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="sr-only peer"
-                            checked={user.isActive}
-                            onChange={(e) =>
-                              updateUserStatus(user, e.target.checked)
-                            }
-                          />
-                          <div className="w-11 relative h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
-                        </label>
-                      </TableCell>
-                    )}
-                    <TableCell className="dark:text-gray-400" align="center">
-                      <div className="flex justify-center items-center gap-2">
-                        {requiredPermissions("user:view") && (
-                          <RemoveRedEyeIcon
-                            className="text-2xl cursor-pointer"
-                            onClick={() => handleView(user.id)}
-                          />
-                        )}
-
-                        {requiredPermissions("user:update") && (
-                          <PencilIcon
-                            className="text-2xl cursor-pointer"
-                            onClick={() => {
-                              setFormData({
-                                clinicId: user?.clinicId?._id,
-                                name: user.name,
-                                password: "",
-                                mobile: user.mobile,
-                                roleId: user.roleId._id,
-                              });
-                              setSelectedUserId(user.id);
-                              setMode("edit");
-                              openModal();
-                            }}
-                          />
-                        )}
-
-                        {requiredPermissions("user:delete") && (
-                          <TrashBinIcon
-                            className="text-2xl cursor-pointer"
-                            onClick={() => handleDelete(user.id)}
-                          />
-                        )}
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {loading ? (
+                [...Array(5)].map((_, index) => (
+                  <tr key={index}>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3 animate-pulse">
+                        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700" />
+                        <div className="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700" />
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                    </td>
 
-              {filteredUsers.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" className="dark:text-gray-400">
-                    No Users found
-                  </TableCell>
-                </TableRow>
-              )}
+                    <td className="px-5 py-4">
+                      <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                    </td>
 
-              {/* <TableRow>
-                <TableCell colSpan={6} align="center">
-                  {!isOpen && (
-                    <div className={isOpen ? "modal-open" : ""}>
-                      <TablePagination
-                        component="div"
-                        count={users.length}
-                        page={page}
-                        rowsPerPage={rowsPerPage}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        sx={{position:"relative", zIndex:"0"}}
-                      />
+                    <td className="px-5 py-4">
+                      <div className="h-6 w-20 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                    </td>
+
+                    {requiredPermissions("user:status_change") && (
+                      <td className="px-5 py-4">
+                        <div className="h-5 w-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                      </td>
+                    )}
+
+                    <td className="px-5 py-4">
+                      <div className="flex justify-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                        <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                        <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={requiredPermissions("user:status_change") ? 5 : 4} className="py-16 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center mb-1" style={{ background: "#eef0ff" }}>
+                        <svg className="w-6 h-6" style={{ color: "#465FFF" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                            d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87m6-4a4 4 0 11-8 0 4 4 0 018 0zm6 4a4 4 0 10-5-3.87" />
+                        </svg>
+                      </div>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No users found</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">Try adjusting your search or filters</p>
                     </div>
-                  )}
-                  <p>hello</p>
-                </TableCell>
-              </TableRow> */}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          totalItems={users.length}
-          currentPage={page + 1}
-          rowsPerPage={rowsPerPage}
-          onPageChange={(p) => setPage(p - 1)}
-          onRowsPerPageChange={(size) => {
-            setRowsPerPage(size);
-            setPage(0);
-          }}
-        />
-      </Card>
+                  </td>
+                </tr>
+              ) : (
+                filteredUsers
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((user) => (
+                    <tr key={user.id} className="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-150">
 
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[600px] m-4">
-        <div className="bg-white rounded-2xl p-6 dark:bg-gray-900">
-          <h3 className="mb-4 font-semibold dark:text-white">
-            {mode === "add"
-              ? "New User"
-              : mode === "edit"
-                ? "Edit User"
-                : "View User"}
-          </h3>
-          {/* 🔹 VIEW MODE → CARD */}
-          {mode === "view" ? (
-            <div className="space-y-4 text-gray-800 dark:text-white/90">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="font-semibold">Name:</p>
-                  <p className="text-blue-600 dark:text-gray-400">{formData.name}</p>
-                </div>
+                      {/* Name */}
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0"
+                            style={{ background: "#eef0ff", color: "#465FFF" }}
+                          >
+                            {user.name?.charAt(0)?.toUpperCase()}
+                          </div>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {user.name}
+                          </span>
+                        </div>
+                      </td>
 
-                <div>
-                  <p className="font-semibold">Mobile:</p>
-                  <p className="text-blue-600 dark:text-gray-400">{formData.mobile}</p>
-                </div>
-                {/* <div>
-                  <p className="font-semibold">Login Number:</p>
-                  <p className="text-blue-600 dark:text-gray-400">{formData}</p>
-                </div> */}
-                <div>
-                  <p className="font-semibold">Role:</p>
-                  <p className="text-blue-600 dark:text-gray-400">{formData.roleId}</p>
-                </div>
+                      {/* Mobile */}
+                      <td className="px-5 py-3.5">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{user.mobile}</span>
+                      </td>
 
-                {role === "SUPER ADMIN" && (
-                  <div>
-                    <p className="font-semibold">Clinic Name:</p>
-                    <p className="text-blue-600 dark:text-gray-400">{formData.clinicId}</p>
-                  </div>
-                )}
-              </div>
+                      {/* Role */}
+                      <td className="px-5 py-3.5">
+                        <span
+                          className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap"
+                          style={{ background: "#eef0ff", color: "#465FFF" }}
+                        >
+                          {user.roleId.name}
+                        </span>
+                      </td>
+
+                      {/* Status */}
+                      {requiredPermissions("user:status_change") && (
+                        <td className="px-5 py-3.5">
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              className="sr-only peer"
+                              checked={user.isActive}
+                              onChange={(e) => updateUserStatus(user, e.target.checked)}
+                            />
+                            <div className="w-10 h-5 bg-gray-200 dark:bg-gray-700 rounded-full peer
+                        peer-checked:bg-emerald-500
+                        after:content-[''] after:absolute after:top-[2px] after:left-[2px]
+                        after:bg-white after:rounded-full after:h-4 after:w-4
+                        after:transition-all peer-checked:after:translate-x-5
+                        transition-colors duration-200" />
+                          </label>
+                        </td>
+                      )}
+
+                      {/* Actions */}
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center justify-center gap-1">
+                          {requiredPermissions("user:view") && (
+                            <button
+                              onClick={() => handleView(user.id)}
+                              title="View"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150
+                          text-gray-400 hover:text-[#465FFF] hover:bg-[#eef0ff]
+                          dark:text-gray-500 dark:hover:text-[#7B91FF] dark:hover:bg-[#465FFF]/10"
+                            >
+                              <svg className="w-[15px] h-[15px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            </button>
+                          )}
+
+                          {requiredPermissions("user:update") && (
+                            <button
+                              onClick={() => {
+                                setFormData({
+                                  clinicId: user?.clinicId?._id,
+                                  name: user.name,
+                                  password: "",
+                                  mobile: user.mobile,
+                                  roleId: user.roleId._id,
+                                });
+                                setSelectedUserId(user.id);
+                                setMode("edit");
+                                openModal();
+                              }}
+                              title="Edit"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150
+                          text-gray-400 hover:text-amber-600 hover:bg-amber-50
+                          dark:text-gray-500 dark:hover:text-amber-400 dark:hover:bg-amber-500/10"
+                            >
+                              <svg className="w-[15px] h-[15px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                          )}
+
+                          {requiredPermissions("user:delete") && (
+                            <button
+                              onClick={() => handleDelete(user.id)}
+                              title="Delete"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150
+                          text-gray-400 hover:text-red-500 hover:bg-red-50
+                          dark:text-gray-500 dark:hover:text-red-400 dark:hover:bg-red-500/10"
+                            >
+                              <svg className="w-[15px] h-[15px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ── Pagination ── */}
+        <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30">
+
+          {/* Left: rows per page */}
+          <div className="flex items-center gap-2.5 flex-shrink-0">
+            <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">Rows per page</span>
+            <div className="flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800">
+              {[10, 20, 30, 50].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => { setRowsPerPage(n); setPage(0); }}
+                  className={`px-3 py-1.5 text-xs font-medium transition-all duration-150 border-r border-gray-200 dark:border-gray-700 last:border-r-0
+              ${rowsPerPage === n
+                      ? "text-white"
+                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    }`}
+                  style={rowsPerPage === n ? { background: "#465FFF" } : {}}
+                >
+                  {n}
+                </button>
+              ))}
             </div>
-          ) : (
-            /* 🔹 ADD / EDIT MODE → SAME FORM (UNCHANGED) */
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <Label>Name</Label>
-                <Input
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
+          </div>
+
+          {/* Right: page info + arrows */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+              <span className="font-semibold text-gray-700 dark:text-gray-200">
+                {page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, filteredUsers.length)}
+              </span>
+              {" "}of{" "}
+              <span className="font-semibold text-gray-700 dark:text-gray-200">{filteredUsers.length}</span>
+            </span>
+
+            <div className="flex items-center gap-1">
+              {/* First */}
+              <button
+                onClick={() => setPage(0)}
+                disabled={page === 0}
+                title="First page"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500
+            hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200
+            disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7M18 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              {/* Prev */}
+              <button
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                title="Previous page"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500
+            hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200
+            disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              {/* Page number pills */}
+              {(() => {
+                const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+                const delta = 1;
+                const pages: (number | "...")[] = [];
+                for (let i = 0; i < totalPages; i++) {
+                  if (i === 0 || i === totalPages - 1 || (i >= page - delta && i <= page + delta)) {
+                    pages.push(i);
+                  } else if (pages[pages.length - 1] !== "...") {
+                    pages.push("...");
+                  }
+                }
+                return pages.map((p, i) =>
+                  p === "..." ? (
+                    <span key={`dot-${i}`} className="w-7 h-7 flex items-center justify-center text-xs text-gray-400">
+                      ···
+                    </span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p as number)}
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-medium transition-all duration-150
+                  ${page === p
+                          ? "text-white shadow-sm"
+                          : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200"
+                        }`}
+                      style={page === p ? { background: "#465FFF" } : {}}
+                    >
+                      {(p as number) + 1}
+                    </button>
+                  )
+                );
+              })()}
+
+              {/* Next */}
+              <button
+                onClick={() => setPage((p) => Math.min(Math.ceil(filteredUsers.length / rowsPerPage) - 1, p + 1))}
+                disabled={page >= Math.ceil(filteredUsers.length / rowsPerPage) - 1}
+                title="Next page"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500
+            hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200
+            disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Last */}
+              <button
+                onClick={() => setPage(Math.ceil(filteredUsers.length / rowsPerPage) - 1)}
+                disabled={page >= Math.ceil(filteredUsers.length / rowsPerPage) - 1}
+                title="Last page"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500
+            hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200
+            disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M6 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[520px]">
+        <div className="dark:bg-gray-900">
+
+          {/* ── Header ── */}
+          <div
+            className="flex items-center gap-4 px-6 py-5"
+            style={{ background: "#465FFF" }}
+          >
+            <div
+              className="w-11 h-11 rounded-full flex items-center justify-center text-white font-semibold text-base flex-shrink-0"
+              style={{ background: "rgba(255,255,255,0.2)" }}
+            >
+              {mode === "add" ? "+" : formData.name?.charAt(0)?.toUpperCase() ?? "?"}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-semibold text-base m-0">
+                {mode === "add" ? "New User" : mode === "edit" ? "Edit User" : formData.name}
+              </p>
+              <p className="text-white/60 text-xs mt-0.5 m-0">
+                {mode === "add" ? "Fill in the details below" : mode === "edit" ? "Update user information" : "User profile"}
+              </p>
+            </div>
+          </div>
+
+          {/* ── Body ── */}
+          <div className="p-6">
+
+            {/* VIEW MODE */}
+            {mode === "view" ? (
+              <div className="grid grid-cols-2 gap-px bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+                {[
+                  { label: "Name", icon: "ti-user", value: formData.name },
+                  { label: "Mobile", icon: "ti-phone", value: formData.mobile },
+                  { label: "Role", icon: "ti-shield", value: formData.roleId, badge: true },
+                  ...(role === "SUPER ADMIN"
+                    ? [{ label: "Clinic", icon: "ti-building", value: formData.clinicId }]
+                    : []),
+                ].map((field) => (
+                  <div
+                    key={field.label}
+                    className="bg-white dark:bg-gray-900 px-5 py-4"
+                  >
+                    <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2 m-0">
+                      <i className={`ti ${field.icon}`} style={{ fontSize: 12, color: "#465FFF" }} />
+                      {field.label}
+                    </p>
+                    {field.badge ? (
+                      <span
+                        className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full"
+                        style={{ background: "#eef0ff", color: "#465FFF" }}
+                      >
+                        {field.value}
+                      </span>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-900 dark:text-white m-0">
+                        {field.value || "—"}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
 
-              <div>
-                <Label>Mobile</Label>
-                <Input
-                  name="mobile"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                  maxLength={10}
-                />
-              </div>
+            ) : (
+              /* ADD / EDIT MODE */
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <Input name="name" value={formData.name} onChange={handleChange} placeholder="Enter Name" />
+                </div>
 
-              <div>
-                { ((mode == "edit"  && role === "SUPER ADMIN")  || mode == "add" )&& (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                    Mobile <span className="text-red-500">*</span>
+                  </label>
+                  <Input name="mobile" value={formData.mobile} onChange={handleChange} maxLength={10} placeholder="Enter Mobile" />
+                </div>
 
+                {((mode === "edit" && role === "SUPER ADMIN") || mode === "add") && (
                   <div>
-                    <Label>Password</Label>
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                      Password <span className="text-red-500">*</span>
+                    </label>
                     <Input
                       type="password"
                       name="password"
-                      // value={formData.password}
-                      placeholder="Add New password"
+                      placeholder="Enter new password"
                       onChange={handleChange}
                     />
                   </div>
                 )}
+
+                {requiredPermissions("roles:list") && (
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                      Role <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="roleId"
+                      value={formData.roleId}
+                      onChange={(e) => setFormData({ ...formData, roleId: e.target.value })}
+                      className="w-full rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2.5 text-sm bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2"
+                      style={{ focusRingColor: "#465FFF" } as React.CSSProperties}
+                    >
+                      <option value="">Select Role</option>
+                      {userRole.map((r) => (
+                        <option key={r._id} value={r._id}>{r.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {requiredPermissions("clinic:list") && role === "SUPER ADMIN" && (
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                      Clinic <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="clinicId"
+                      value={formData.clinicId}
+                      onChange={(e) => setFormData({ ...formData, clinicId: String(e.target.value) })}
+                      className="w-full rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2.5 text-sm bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2"
+                    >
+                      <option value="">Select Clinic</option>
+                      {clinics.map((c) => (
+                        <option key={c._id} value={c._id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
+            )}
 
-              {requiredPermissions("roles:list") && (
-                <div>
-                  <Label>Role</Label>
-                  <select
-                    name="roleId"
-                    value={formData.roleId}
-                    onChange={(e) =>
-                      setFormData({ ...formData, roleId: e.target.value })
-                    }
-                    className="w-full rounded-lg border border-gray-300 p-2 dark:bg-gray-800 dark:text-white"
-                  >
-                    <option value="">Select Role</option>
-                    {userRole.map((role) => (
-                      <option key={role?._id} value={role?._id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            {/* ── Footer ── */}
+            <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-gray-100 dark:border-gray-800">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+              >
+                Close
+              </button>
+              {mode === "add" && (
+                <button
+                  onClick={handleSave}
+                  className="px-5 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90"
+                  style={{ background: "#465FFF" }}
+                >
+                  Save User
+                </button>
               )}
-
-              {requiredPermissions("clinic:list") && (
-                <div>
-                  {role === "SUPER ADMIN" && (
-                    <div>
-                      <Label>Clinic</Label>
-                      <select
-                        name="clinicId"
-                        value={formData.clinicId}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            clinicId: String(e.target.value),
-                          })
-                        }
-                        className="w-full rounded-lg border border-gray-300 p-2 dark:bg-gray-800 dark:text-white"
-                      >
-                        <option value="">Select Clinics</option>
-                        {clinics.map((clinicId) => (
-                          <option key={clinicId._id} value={clinicId._id}>
-                            {clinicId.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
+              {mode === "edit" && (
+                <button
+                  onClick={() => handleEdit()}
+                  className="px-5 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90"
+                  style={{ background: "#465FFF" }}
+                >
+                  Save Changes
+                </button>
               )}
             </div>
-          )}
-
-          <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" onClick={closeModal}>
-              Close
-            </Button>
-            {mode == "add" && <Button onClick={handleSave}>Save</Button>}
-            {mode == "edit" && (
-              <Button onClick={() => handleEdit()}>Save</Button>
-            )}
           </div>
         </div>
       </Modal>
